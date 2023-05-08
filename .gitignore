@@ -1,0 +1,6 @@
+*.sw?
+.envrc
+.tool-versions
+.envrc
+target
+.envrc

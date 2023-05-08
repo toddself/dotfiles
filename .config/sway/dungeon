@@ -1,0 +1,18 @@
+output eDP-1 pos 0 0 res 2256x1504 scale 1.33
+output * bg /home/todd/Pictures/yosemite.jpg fill
+
+input "type:touchpad" {
+  tap enabled
+  dwt enabled
+  tap_button_map lrm
+  natural_scroll enabled
+  click_method clickfinger
+  drag disabled
+  scroll_factor 0.5
+}
+
+workspace 1 
+exec alacritty 
+
+workspace 2
+exec firefox

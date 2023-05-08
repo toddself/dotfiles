@@ -1,0 +1,10 @@
+{
+  "tsserver.reportStyleChecksAsWarnings": false,
+  "typescript.showUnused": false,
+  "javascript.showUnused": false,
+  "go.goplsOptions": {
+    "semanticTokens": true
+  },
+  "javascript.suggestionActions.enabled": false,
+  "coc.preferences.formatOnSaveFiletypes": ["js", "ts"]
+}

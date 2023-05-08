@@ -1,0 +1,157 @@
+# Generated for MacOS bash. Do not edit.
+[ -s "$HOME/.bashrc" ] && source "$HOME/.bashrc"
+
+auth() {
+  local KEY=$(openssl rand -hex 18) 
+  eval $(aws-okta-processor authenticate -e -o $OKTA_DOMAIN -u $USER -k $KEY -d 7200)
+}
+
+dlgd() {
+  aws ecr get-login --no-include-email --registry-ids $AWS_ECR_ACCOUNT
+}
+
+splitio() {
+  aws secretsmanager get-secret-value --secret-id ${EXPR_API} --output text --query SecretString
+}
+
+okta_fd_dp() {
+  eval $(oktaplz --user ${USER} --role $AWS_ROLE_1)
+}
+
+okta_fd_dev() {
+  eval $(oktaplz --user ${USER} --role $AWS_ROLE_2)
+}
+
+okta_fd_test() {
+  eval $(oktaplz --user ${USER} --role $AWS_ROLE_3)
+} 
+
+okta_fd_ote() {
+  eval $(oktaplz --user ${USER} --role $AWS_ROLE_4)
+}
+
+okta_fd_prod() {
+  eval $(oktaplz --user ${USER} --role $AWS_ROLE_5)
+}
+
+okta_fd_cicd() {
+  eval $(oktaplz --user ${USER} --role $AWS_ROLE_6)
+}
+
+okta_fdp_dev() {
+  eval $(oktaplz -a gdp --user ${USER} --role $AWS_ROLE_7)
+}
+
+okta_fdp_test() {
+  eval $(oktaplz -a gdp --user ${USER} --role $AWS_ROLE_8)
+}
+
+okta_fdp_ote() {
+  eval $(oktaplz -a gdp --user ${USER} --role $AWS_ROLE_9)
+}
+
+okta_fdp_prod() {
+  eval $(oktaplz -a gdp --user ${USER} --role $AWS_ROLE_10)
+} 
+
+# deploys
+
+deploy-cluster() {
+  local VERSION=$1
+  local CLUSTER=$2
+  local ENV=$3
+  local REF=${4:-main}
+  echo "Deploying Cluster ${VERSION} to ${CLUSTER}-${ENV} (using ${REF})"
+  gh workflow run --ref=$REF --repo ${GH_ORG}/${GH_REPO} deploy.yaml -f command=rollout -f env=${ENV} -f efdVersion=${VERSION} -f delete=true -f baseClusterId=${CLUSTER}
+
+}
+
+deploy-config() {
+  local VERSION=$1
+  local CLUSTER=$2
+  local ENV=$3
+  local TYPE=${4:-tag} 
+  local REF=${5:-main}
+  echo "Deploying Config ${TYPE}/${VERSION} to ${CLUSTER}-${ENV} (using ${REF})"
+  CLUSTER_PARAM="-f baseClusterId=${CLUSTER}"
+  if [ "$CLUSTER" = "all" ]; then
+    CLUSTER_PARAM=""
+  fi
+  gh workflow run config-deploy.yaml --repo ${GH_ORG}/${GH_REPO} --ref ${REF} -f env=${ENV} -f configVersion=${VERSION} ${CLUSTER_PARAM} -f versionType=${TYPE}
+
+}
+
+# jira!
+alias sprint="jira sprint list --current --state active --order-by status --plain --columns key,summary,status,assignee"
+alias mine="jira issues list -a${USER} --plain -s~Done"
+alias open_tickets="jira sprint list --current --state active --order-by status --plain --columns key,summary,status,assignee -ax"
+alias jv="jira issue view --plain"
+alias epics="jira epic list --table --plain --columns=key,summary"
+alias backlog="jira issue list --order-by priority --plain --columns key,summary,assignee,status -s\"to do\" -ax"
+
+work() {
+  local PHASE=$1
+  local STORY=$2
+  case $PHASE in
+  "start")
+    jira issue move ${STORY} 'in progress';;
+  "stop")
+    jira issue move ${STORY} 'peer review';;
+  "done")
+    jira issue move ${STORY} 'done';;
+  "help" )
+    echo "start: move to in progress, stop: move to peer review, done: move to done";;
+  *)
+    echo "I don't know what ${PHASE} is";;
+  esac
+}
+
+jc() {
+  local TITLE=$1
+  local STORY_POINTS=$2
+  local EPIC=$3
+  jira issue create -t Story -C 'Front Door Platform' -s "${TITLE}" --custom story-points=${STORY_POINTS} -P${EPIC}
+}
+
+add_to_sprint() {
+  local SPRINT=$(jira sprint list --plain --table | grep active | head -n 1)
+  local SPRINT_ID=$(echo "${SPRINT}" | awk '{print $1}')
+  local SPRINT_NAME=$(echo "${SPRINT}" | awk '{print $2}')
+  local ENDING=$(echo "${SPRINT}" | awk '{print $8}')
+  local STORY=$1
+  echo "Adding ${STORY} to sprint ${SPRINT_NAME} ending on ${ENDING}"
+  jira sprint add ${SPRINT_ID} ${STORY}
+}
+
+add_to_ready() {
+  local SPRINT_ID="48477"
+  local SPRINT_NAME="Ready"
+  local STORY=$1
+  echo "Adding ${STORY} to sprint ${SPRINT_NAME}"
+  jira sprint add ${SPRINT_ID} ${STORY}
+}
+
+comment() {
+  local TICKET=$1
+  local COMMENT=$2
+  jira issue comment add ${TICKET} --no-input "${COMMENT}"
+}
+
+get_instances() {
+  aws ec2 describe-instances | jq -r ".Reservations[].Instances[] | select( .SecurityGroups[].GroupName | contains(\"${1}\")) | .InstanceId" 
+}
+
+start_session() {
+  aws ssm start-session --target $(get_instances ${1} | tail -n 1)
+}
+
+assign() {
+  local TICKET=$1
+  jira issue assign $TICKET $USER
+}
+
+unassign() {
+  local TICKET=$1
+  jira issue assign $TICKET x
+}
+
