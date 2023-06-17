@@ -1,0 +1,17 @@
+font:
+  size: 14.0
+
+window:
+  dimensions:
+    columns: 228
+    lines: 69
+  position:
+    x: 0
+    y: 0
+  decorations: none
+
+shell:
+  program: /opt/homebrew/bin/bash
+  args:
+    - --login
+
