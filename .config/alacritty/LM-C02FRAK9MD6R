@@ -2,13 +2,15 @@ font:
   size: 15.0
 
 window:
+  padding:
+    x: 10
+    y: 10
   dimensions:
     columns: 167
     lines: 93
   position:
     x: 3008
     y: 0
-  decorations: none
 
 shell:
   program: /usr/local/bin/bash

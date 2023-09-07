@@ -50,6 +50,7 @@ return require('packer').startup(function(use)
   use 'sheerun/vim-polyglot'
   use { 'mhartington/formatter.nvim', cmd = {"Format", "FormatWrite"}, config = lua_path'formatter' }
   use 'ron-rs/ron.vim'
+  use 'github/copilot.vim'
 
   -- completeions
   use 'hrsh7th/cmp-path'

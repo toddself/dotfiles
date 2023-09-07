@@ -62,7 +62,11 @@ deploy-cluster() {
   local ENV=$3
   local REF=${4:-main}
   echo "Deploying Cluster ${VERSION} to ${CLUSTER}-${ENV} (using ${REF})"
-  gh workflow run --ref=$REF --repo ${GH_ORG}/${GH_REPO} deploy.yaml -f command=rollout -f env=${ENV} -f efdVersion=${VERSION} -f delete=true -f baseClusterId=${CLUSTER}
+  if [ "$CLUSTER" = "all" ]; then
+    gh workflow run --ref=$REF --repo ${_ACTION_ORG}/${_ACTION_REPO} deploy.yaml -f command=rollout -f env=${ENV} -f efdVersion=${VERSION} -f delete=true
+  else 
+    gh workflow run --ref=$REF --repo ${_ACTION_ORG}/${_ACTION_REPO} deploy.yaml -f command=rollout -f env=${ENV} -f efdVersion=${VERSION} -f delete=true -f baseClusterId=${CLUSTER}
+  fi
 
 }
 
@@ -77,8 +81,22 @@ deploy-config() {
   if [ "$CLUSTER" = "all" ]; then
     CLUSTER_PARAM=""
   fi
-  gh workflow run config-deploy.yaml --repo ${GH_ORG}/${GH_REPO} --ref ${REF} -f env=${ENV} -f configVersion=${VERSION} ${CLUSTER_PARAM} -f versionType=${TYPE}
+  gh workflow run config-deploy.yaml --repo ${_ACTION_ORG}/${_ACTION_REPO} --ref ${REF} -f env=${ENV} -f configVersion=${VERSION} ${CLUSTER_PARAM} -f versionType=${TYPE}
 
+}
+
+check-config() {
+  local VERSION=$1
+  local DOMAIN=$2
+
+  local CURRENT_VERSION=$(curl -s http://${DOMAIN}/_envoy/version | jq -r '.config_version')
+  echo "Current version for ${DOMAIN} is ${CURRENT_VERSION}, looking for ${VERSION}"
+
+  while [ "$CURRENT_VERSION" != "${VERSION}" ]; do
+    CURRENT_VERSION=$(curl -s http://${DOMAIN}/_envoy/version | jq -r '.config_version')
+    echo -n "."
+    sleep 5
+  done 
 }
 
 # jira!
