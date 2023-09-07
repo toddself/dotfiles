@@ -49,6 +49,7 @@ return require('packer').startup(function(use)
   use 'simrat39/rust-tools.nvim'
   use 'sheerun/vim-polyglot'
   use { 'mhartington/formatter.nvim', cmd = {"Format", "FormatWrite"}, config = lua_path'formatter' }
+  use 'ron-rs/ron.vim'
 
   -- completeions
   use 'hrsh7th/cmp-path'

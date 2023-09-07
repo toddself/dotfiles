@@ -1,7 +1,4 @@
 #!/bin/sh
-echo "-> Installing packages from arch"
-sudo pacman -Sy --needed $(comm -12 <(pacman -Slq|sort) <(sort pkglist.txt)) > /dev/null
-
 if [ ! -d ${HOME}/.pacaur ]; then
   echo "-> Installing pacaur"
   mkdir $HOME/.pacaur 
@@ -16,7 +13,3 @@ if [ ! -d ${HOME}/.pacaur ]; then
   popd
   popd
 fi
-
-echo "-> Installing packages from AUR"
-pacaur -S --noedit --noconfirm --needed $(cat aur-pkglist.txt) > /dev/null
-

@@ -75,7 +75,7 @@ local rust_opts = {
       on_attach(_, bufnr)
     end,
     settings = {
-      cmd = {"rustup run stable rust-analyzer"},
+      cmd = {"/usr/local/bin/rust-analyzer"},
       ['rust-analyzer'] = {
         lens = {
           enable = true,
