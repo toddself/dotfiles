@@ -90,7 +90,15 @@ return require('packer').startup(function(use)
   -- treesitter
   use { 'David-Kunz/markid' }
   use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate', config = lua_path'treesitter' }
-  use { 'lukas-reineke/indent-blankline.nvim', config = lua_path'indent-blankline' }
+  use { 'lukas-reineke/indent-blankline.nvim', main = 'ibl', options = {
+      indent = {
+        char = '▏',
+      },
+      exclude = {
+        filetypes = {'help', 'startify', 'alpha', 'dashboard', 'packer', 'neogitstatus', 'NvimTree', 'mason.nvim'},
+        buftypes = {'terminal'}
+      }
+  }}
 
 
   -- icons and statusbar
