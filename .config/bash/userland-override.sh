@@ -1,7 +1,7 @@
 # replace userland tools
 if command -v eza >> /dev/null; then
   alias ls="eza"
-  alias dir="eza -lmFh --git"
+  alias dir="eza -lmh -F=always --git"
 else
   if [ "$(uname)" = "Darwin" ]; then
     alias dir="ls -lGFht"
