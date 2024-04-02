@@ -80,7 +80,7 @@ local rust_opts = {
         lens = {
           enable = true,
         },
-        checkonsave = {
+        checkOnSave = {
           command = 'clippy'
         },
       },
